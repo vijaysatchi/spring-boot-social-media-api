@@ -3,7 +3,7 @@ package com.example.social_media.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -29,7 +29,7 @@ public class User {
     private String password;
 
     @Column(name = "date_created", insertable = false, updatable = false)
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Post> posts;

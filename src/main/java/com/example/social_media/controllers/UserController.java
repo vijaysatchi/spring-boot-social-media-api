@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/user")
@@ -45,7 +46,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
         var user = userMapper.toEntity(request);
-        user.setDateCreated(java.time.LocalDateTime.now());
+        user.setDateCreated(LocalDate.now());
         userRepository.save(user);
         var uri = uriComponentsBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(userMapper.toDto(user));
