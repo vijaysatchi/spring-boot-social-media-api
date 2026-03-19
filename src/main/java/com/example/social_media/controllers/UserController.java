@@ -7,11 +7,8 @@ import com.example.social_media.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/user")
@@ -41,7 +38,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> registerUser(
-            @Valid @RequestBody RegisterUserRequest request
+            @Valid @RequestBody RegisterUserRequest request,
+            UriComponentsBuilder uriComponentsBuilder
             ){
         if(userRepository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().build();
@@ -49,15 +47,7 @@ public class UserController {
         var user = userMapper.toEntity(request);
         user.setDateCreated(java.time.LocalDateTime.now());
         userRepository.save(user);
-        return ResponseEntity.ok(userMapper.toDto(user));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> validationHandler(MethodArgumentNotValidException ex){
-        var errors = new HashMap<String, String>();
-
-        ex.getBindingResult().getFieldErrors().forEach((error) -> errors.put(error.getField(), error.getDefaultMessage()));
-
-        return ResponseEntity.badRequest().body(errors);
+        var uri = uriComponentsBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri();
+        return ResponseEntity.created(uri).body(userMapper.toDto(user));
     }
 }
