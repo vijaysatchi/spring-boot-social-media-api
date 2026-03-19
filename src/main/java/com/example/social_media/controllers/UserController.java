@@ -46,9 +46,7 @@ public class UserController {
     public ResponseEntity<Map<String, String>> validationHandler(MethodArgumentNotValidException ex){
         var errors = new HashMap<String, String>();
 
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
+        ex.getBindingResult().getFieldErrors().forEach((error) -> errors.put(error.getField(), error.getDefaultMessage()));
 
         return ResponseEntity.badRequest().body(errors);
     }

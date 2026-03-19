@@ -4,7 +4,6 @@ import com.example.social_media.dtos.RegisterUserRequest;
 import com.example.social_media.dtos.UserDto;
 import com.example.social_media.entities.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
