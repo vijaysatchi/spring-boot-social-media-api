@@ -28,7 +28,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "date_created")
+    @Column(name = "date_created", insertable = false, updatable = false)
     private LocalDateTime dateCreated;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)

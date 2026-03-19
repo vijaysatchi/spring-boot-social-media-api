@@ -24,7 +24,7 @@ public class Post {
     @Column(name = "caption")
     private String caption;
 
-    @Column(name = "date_created")
+    @Column(name = "date_created", insertable = false, updatable = false)
     private LocalTime timeCreated;
 
     @ManyToOne
