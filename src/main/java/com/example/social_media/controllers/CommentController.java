@@ -2,12 +2,13 @@ package com.example.social_media.controllers;
 
 import com.example.social_media.dtos.CommentDto;
 import com.example.social_media.dtos.CreateCommentRequest;
+import com.example.social_media.entities.Comment;
 import com.example.social_media.mappers.CommentMapper;
 import com.example.social_media.repositories.CommentRepository;
 import com.example.social_media.repositories.PostRepository;
 import com.example.social_media.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,6 +21,15 @@ public class CommentController {
     private final CommentMapper commentMapper;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentDto> getComment(@PathVariable Long id) {
+        Comment comment = commentRepository.findById(id).orElse(null);
+        if (comment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(commentMapper.toDto(comment));
+    }
 
     @PostMapping("/{id}")
     public ResponseEntity<CommentDto> createComment(
@@ -42,5 +52,16 @@ public class CommentController {
         var commentDto = commentMapper.toDto(comment);
         var uri =  uriBuilder.path("/api/comment/{id}").buildAndExpand(comment.getId()).toUri();
         return ResponseEntity.created(uri).body(commentDto);
+    }
+
+    @Transactional
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
+        var comment = commentRepository.findById(id).orElse(null);
+        if (comment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        comment.getPost().removeComment(comment);
+        return ResponseEntity.ok().build();
     }
 }

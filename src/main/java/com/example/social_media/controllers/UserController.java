@@ -5,7 +5,6 @@ import com.example.social_media.dtos.RegisterUserRequest;
 import com.example.social_media.dtos.UserDto;
 import com.example.social_media.mappers.PostMapper;
 import com.example.social_media.mappers.UserMapper;
-import com.example.social_media.repositories.PostRepository;
 import com.example.social_media.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -13,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController

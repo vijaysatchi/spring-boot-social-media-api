@@ -5,7 +5,6 @@ import com.example.social_media.dtos.PostDto;
 import com.example.social_media.entities.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper {
@@ -14,6 +13,5 @@ public interface PostMapper {
     PostDto toDto(Post post);
 
     @Mapping(target = "user", ignore = true)
-//    @Mapping(target = "timeCreated", expression = "java(java.time.LocalDateTime.now())")
     Post toEntity(CreatePostRequest createPostRequest);
 }
