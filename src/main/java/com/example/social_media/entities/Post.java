@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -25,7 +25,7 @@ public class Post {
     private String caption;
 
     @Column(name = "date_created", insertable = false, updatable = false)
-    private LocalTime timeCreated;
+    private LocalDateTime timeCreated;
 
     @ManyToOne
     @JoinColumn(name="user_id")

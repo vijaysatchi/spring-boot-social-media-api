@@ -36,4 +36,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Comment> comments;
+
+    public void addPost(Post post){
+        posts.add(post);
+        post.setUser(this);
+    }
+
+    public void removePost(Post post){
+        posts.remove(post);
+        post.setUser(null);
+    }
 }
