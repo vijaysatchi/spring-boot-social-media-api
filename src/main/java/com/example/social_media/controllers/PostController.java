@@ -1,11 +1,13 @@
 package com.example.social_media.controllers;
 
 import com.example.social_media.dtos.CreatePostRequest;
+import com.example.social_media.dtos.EditPostRequest;
 import com.example.social_media.dtos.PostDto;
 import com.example.social_media.mappers.PostMapper;
 import com.example.social_media.repositories.PostRepository;
 import com.example.social_media.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +48,20 @@ public class PostController {
         var postDto = postMapper.toDto(post);
         var uri = uriComponentsBuilder.path("/api/post/{id}").buildAndExpand(post.getId()).toUri();
         return ResponseEntity.created(uri).body(postDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable Long id,
+            @RequestBody @Valid EditPostRequest request
+    ){
+        var post = postRepository.findById(id).orElse(null);
+        if(post == null){
+            return ResponseEntity.notFound().build();
+        }
+        postMapper.update(request, post);
+        var postDto = postMapper.toDto(postRepository.save(post));
+        return ResponseEntity.ok(postDto);
     }
 
     @Transactional

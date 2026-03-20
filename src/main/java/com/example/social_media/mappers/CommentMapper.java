@@ -2,9 +2,11 @@ package com.example.social_media.mappers;
 
 import com.example.social_media.dtos.CommentDto;
 import com.example.social_media.dtos.CreateCommentRequest;
+import com.example.social_media.dtos.EditCommentRequest;
 import com.example.social_media.entities.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
@@ -13,4 +15,6 @@ public interface CommentMapper {
     CommentDto toDto(Comment comment);
 
     Comment toEntity(CreateCommentRequest request);
+
+    void update(EditCommentRequest request, @MappingTarget Comment comment);
 }
