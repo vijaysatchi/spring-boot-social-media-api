@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -20,6 +23,10 @@ public class Comment {
 
     @Column(name = "text")
     private String text;
+
+    @CreationTimestamp
+    @Column(name = "date_created", updatable = false)
+    private LocalDateTime dateCreated;
 
     @ManyToOne
     @JoinColumn(name="user_id")

@@ -17,11 +17,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @AllArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
     private final UserMapper userMapper;
     private final PostMapper postMapper;
 
@@ -67,9 +66,8 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
         var user = userMapper.toEntity(request);
-        user.setDateCreated(LocalDate.now());
         userRepository.save(user);
-        var uri = uriComponentsBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri();
+        var uri = uriComponentsBuilder.path("/api/user/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(userMapper.toDto(user));
     }
 }

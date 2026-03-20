@@ -2,6 +2,7 @@ package com.example.social_media.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +29,8 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "date_created", insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "date_created", updatable = false)
     private LocalDate dateCreated;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
@@ -45,5 +47,10 @@ public class User {
     public void removePost(Post post){
         posts.remove(post);
         post.setUser(null);
+    }
+
+    public void addComment(Comment comment){
+        comments.add(comment);
+        comment.setUser(this);
     }
 }

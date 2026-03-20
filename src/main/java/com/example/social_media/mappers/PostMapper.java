@@ -14,6 +14,6 @@ public interface PostMapper {
     PostDto toDto(Post post);
 
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "timeCreated", expression = "java(java.time.LocalDateTime.now())")
+//    @Mapping(target = "timeCreated", expression = "java(java.time.LocalDateTime.now())")
     Post toEntity(CreatePostRequest createPostRequest);
 }

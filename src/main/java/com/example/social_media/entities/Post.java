@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +25,8 @@ public class Post {
     @Column(name = "caption")
     private String caption;
 
-    @Column(name = "date_created", insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "date_created", updatable = false)
     private LocalDateTime timeCreated;
 
     @ManyToOne
@@ -33,4 +35,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
+
+    public void addComment(Comment comment){
+        comments.add(comment);
+        comment.setPost(this);
+    }
 }

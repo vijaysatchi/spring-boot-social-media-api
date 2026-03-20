@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/api/post")
 @AllArgsConstructor
 public class PostController {
     private final PostRepository postRepository;
@@ -44,7 +44,7 @@ public class PostController {
         postRepository.save(post);
 
         var postDto = postMapper.toDto(post);
-        var uri = uriComponentsBuilder.path("/post/{id}").buildAndExpand(post.getId()).toUri();
+        var uri = uriComponentsBuilder.path("/api/post/{id}").buildAndExpand(post.getId()).toUri();
         return ResponseEntity.created(uri).body(postDto);
     }
 

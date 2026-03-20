@@ -1,0 +1,1 @@
+alter table comments add date_created timestamp default (current_timestamp) not null;
