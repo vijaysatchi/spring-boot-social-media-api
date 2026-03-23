@@ -12,7 +12,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "spring.jwt")
 @Data
 public class JwtConfig {
-    private String secret = "secret";
+    private String secret;
     private long accessTokenExpiration;
     private Set<String> claims;
 

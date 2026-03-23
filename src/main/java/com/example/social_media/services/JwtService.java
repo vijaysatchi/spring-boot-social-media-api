@@ -21,7 +21,9 @@ public class JwtService {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtConfig.getAccessTokenExpiration() * 1000));
 
-        customClaims.forEach(claimsBuilder::add);
+        if(customClaims != null) {
+            customClaims.forEach(claimsBuilder::add);
+        }
 
         return new Jwt(
                 claimsBuilder.build(),

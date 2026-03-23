@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/api/comment/**").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/user").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/auth/validate").permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();
