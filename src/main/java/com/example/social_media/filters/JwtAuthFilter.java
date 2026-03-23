@@ -31,7 +31,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         var jwt = jwtService.parseToken(token);
         if (jwt == null) {
             filterChain.doFilter(request, response);
+            return;
         }
+        System.out.println("jwt.subject: " + jwt.getSubject());
 
         var authentication = new UsernamePasswordAuthenticationToken(
                 jwt.getSubject(),

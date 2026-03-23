@@ -15,11 +15,20 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
 
-    public Jwt generateToken(String email, Map<String, Object> customClaims){
+    public Jwt generateAccessToken(String email, Map<String, Object> customClaims){
+        return generateToken(email, customClaims, jwtConfig.getAccessTokenExpiration());
+
+    }
+
+    public Jwt generateRefreshToken(String email, Map<String, Object> customClaims){
+        return generateToken(email, customClaims, jwtConfig.getRefreshTokenExpiration());
+    }
+
+    public Jwt generateToken(String email, Map<String, Object> customClaims, long expiration){
         var claimsBuilder = Jwts.claims()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtConfig.getAccessTokenExpiration() * 1000));
+                .expiration(new Date(System.currentTimeMillis() + expiration * 1000));
 
         if(customClaims != null) {
             customClaims.forEach(claimsBuilder::add);

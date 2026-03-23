@@ -13,7 +13,8 @@ import java.util.Set;
 @Data
 public class JwtConfig {
     private String secret;
-    private long accessTokenExpiration;
+    private int accessTokenExpiration;
+    private int refreshTokenExpiration;
     private Set<String> claims;
 
     public SecretKey getSecretKey(){

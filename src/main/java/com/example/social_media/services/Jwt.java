@@ -23,7 +23,7 @@ public class Jwt{
     }
 
     public boolean isExpired (){
-        return claims.getExpiration().after(new Date());
+        return claims.getExpiration().before(new Date());
     }
 
     public String getClaim(String claim) {
