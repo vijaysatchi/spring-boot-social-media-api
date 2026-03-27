@@ -11,12 +11,9 @@ import com.example.social_media.mappers.UserMapper;
 import com.example.social_media.repositories.FollowRepository;
 import com.example.social_media.repositories.UserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sun.nio.cs.ext.SimpleEUCEncoder;
 
 @Service
 @AllArgsConstructor

@@ -1,25 +1,15 @@
 package com.example.social_media.controllers;
 
-import com.example.social_media.dtos.PostDto;
 import com.example.social_media.dtos.RegisterUserRequest;
 import com.example.social_media.dtos.UpdateUserRequest;
 import com.example.social_media.dtos.UserDto;
-import com.example.social_media.entities.Follow;
-import com.example.social_media.mappers.PostMapper;
 import com.example.social_media.mappers.UserMapper;
-import com.example.social_media.repositories.FollowRepository;
-import com.example.social_media.repositories.UserRepository;
 import com.example.social_media.services.UserService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
