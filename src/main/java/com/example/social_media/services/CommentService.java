@@ -58,8 +58,7 @@ public class CommentService {
     public CommentDto updateComment(Long id, EditCommentRequest request) {
         var comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Comment #" + id + " not found."));
         commentMapper.update(request, comment);
-        var newComment = commentRepository.save(comment);
-        return commentMapper.toDto(newComment);
+        return commentMapper.toDto(comment);
     }
 
     @Transactional
