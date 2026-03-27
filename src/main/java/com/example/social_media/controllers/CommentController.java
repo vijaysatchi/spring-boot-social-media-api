@@ -24,8 +24,6 @@ import java.util.List;
 @RequestMapping("/api")
 @AllArgsConstructor
 public class CommentController {
-    private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
     private final CommentService commentService;
 
 
@@ -40,11 +38,7 @@ public class CommentController {
             @PathVariable Long id,
             @RequestParam(required = false, defaultValue = "0", name="page") Integer page
     ) {
-        var commentsPage = commentService.getCommentsByPostId(id, page);
-        var comments = commentsPage
-                .stream()
-                .map(commentMapper::toDto)
-                .toList();
+        var comments = commentService.getCommentsByPostId(id, page);
         return ResponseEntity.ok(comments);
     }
 
@@ -53,10 +47,8 @@ public class CommentController {
             @PathVariable Long id,
             @RequestBody @Valid CreateCommentRequest request,
             UriComponentsBuilder uriBuilder) {
-        var comment = commentMapper.toEntity(request);
-        var newComment = commentService.createComment(id, request.getUserId(), comment);
-        var uri =  uriBuilder.path("/api/comment/{id}").buildAndExpand(newComment.getId()).toUri();
-        var commentDto = commentMapper.toDto(newComment);
+        var commentDto = commentService.createComment(id, request.getUserId(), request);
+        var uri =  uriBuilder.path("/api/comment/{id}").buildAndExpand(commentDto.getId()).toUri();
         return ResponseEntity.created(uri).body(commentDto);
     }
 
@@ -65,8 +57,7 @@ public class CommentController {
             @PathVariable Long id,
             @RequestBody @Valid EditCommentRequest request){
         var updatedComment = commentService.updateComment(id, request);
-        var commentDto = commentMapper.toDto(updatedComment);
-        return ResponseEntity.ok(commentDto);
+        return ResponseEntity.ok(updatedComment);
     }
 
     @DeleteMapping("/comment/{id}")

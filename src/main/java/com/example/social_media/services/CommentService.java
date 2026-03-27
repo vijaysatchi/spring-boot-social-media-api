@@ -1,6 +1,7 @@
 package com.example.social_media.services;
 
 import com.example.social_media.dtos.CommentDto;
+import com.example.social_media.dtos.CreateCommentRequest;
 import com.example.social_media.dtos.EditCommentRequest;
 import com.example.social_media.entities.Comment;
 import com.example.social_media.exceptions.ResourceNotFoundException;
@@ -31,26 +32,34 @@ public class CommentService {
         return commentMapper.toDto(comment);
     }
 
-    public Comment createComment(Long postId, Long userId, Comment comment){
+    public CommentDto createComment(Long postId, Long userId, CreateCommentRequest request){
         var post = postService.findById(postId);
         var user = userService.findById(userId);
+        var comment = commentMapper.toEntity(request);
+
         post.addComment(comment);
         user.addComment(comment);
 
-        return commentRepository.save(comment);
+        var newComment = commentRepository.save(comment);
+        return commentMapper.toDto(newComment);
     }
 
-    public Page<Comment> getCommentsByPostId(Long id, Integer page) {
+    public List<CommentDto> getCommentsByPostId(Long id, Integer page) {
         postService.findById(id);
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "timeCreated"));
-        return commentRepository.findByPostId(id, pageRequest);
+
+        return commentRepository.findByPostId(id, pageRequest)
+                .stream()
+                .map(commentMapper::toDto)
+                .toList();
     }
 
     @Transactional
-    public Comment updateComment(Long id, EditCommentRequest request) {
+    public CommentDto updateComment(Long id, EditCommentRequest request) {
         var comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Comment #" + id + " not found."));
         commentMapper.update(request, comment);
-        return commentRepository.save(comment);
+        var newComment = commentRepository.save(comment);
+        return commentMapper.toDto(newComment);
     }
 
     @Transactional
