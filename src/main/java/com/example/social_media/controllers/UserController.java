@@ -2,14 +2,20 @@ package com.example.social_media.controllers;
 
 import com.example.social_media.dtos.PostDto;
 import com.example.social_media.dtos.RegisterUserRequest;
+import com.example.social_media.dtos.UpdateUserRequest;
 import com.example.social_media.dtos.UserDto;
+import com.example.social_media.entities.Follow;
 import com.example.social_media.mappers.PostMapper;
 import com.example.social_media.mappers.UserMapper;
+import com.example.social_media.repositories.FollowRepository;
 import com.example.social_media.repositories.UserRepository;
+import com.example.social_media.services.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,56 +25,49 @@ import java.util.List;
 @RequestMapping("/api/user")
 @AllArgsConstructor
 public class UserController {
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PostMapper postMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable(name="id") Long id){
-        var user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(userMapper.toDto(user));
+    public ResponseEntity<UserDto> getUserDto(@PathVariable(name="id") Long id){
+        var userDto = userService.getUserDtoById(id);
+        return ResponseEntity.ok(userDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(
+            @PathVariable(name = "id") Long id,
+            @RequestBody @Valid UpdateUserRequest request
+    ){
+        var userDto = userService.updateUser(id, request);
+        return ResponseEntity.ok(userDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable(name="id") Long id){
-        var user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-        userRepository.delete(user);
+        userService.delete(id);
         return ResponseEntity.ok().build();
     }
 
-    @Transactional
-    @GetMapping("/{id}/posts")
-    public ResponseEntity<List<PostDto>> getPosts(@PathVariable(name="id") Long id){
-        var user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-        var postsList = user.getPosts()
-                .stream()
-                .map(postMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(postsList);
+    @PostMapping("/{id}/follow/{targetId}")
+    public ResponseEntity<Void> followUser(@PathVariable(name="id") Long id, @PathVariable(name="targetId") Long targetId){
+        userService.follow(id, targetId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/unfollow/{targetId}")
+    public ResponseEntity<Void> unfollowUser(@PathVariable(name="id") Long id, @PathVariable(name="targetId") Long targetId){
+        userService.unfollow(id, targetId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping
     public ResponseEntity<UserDto> registerUser(
-            @Valid @RequestBody RegisterUserRequest request,
+            @RequestBody @Valid RegisterUserRequest request,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        if(userRepository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().build();
-        }
-        var user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        var uri = uriComponentsBuilder.path("/api/user/{id}").buildAndExpand(user.getId()).toUri();
-        return ResponseEntity.created(uri).body(userMapper.toDto(user));
+        var userDto = userService.registerUser(request);
+        var uri = uriComponentsBuilder.path("/api/user/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 }

@@ -39,10 +39,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "following")
+    @OneToMany(mappedBy = "following", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private List<Follow> followers;
 
-    @OneToMany(mappedBy = "follower")
+    @OneToMany(mappedBy = "follower",  cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private List<Follow> following;
 
     public void addPost(Post post){
@@ -63,5 +63,12 @@ public class User {
     public void removeComment(Comment comment){
         comments.remove(comment);
         comment.setUser(null);
+    }
+
+    public Follow follow(User userToFollow){
+        Follow follow = new Follow(this, userToFollow);
+        followers.add(follow);
+        userToFollow.following.add(follow);
+        return follow;
     }
 }
