@@ -1,23 +1,17 @@
 package com.example.social_media.services;
 
+import com.example.social_media.entities.User;
+import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.repositories.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 @AllArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
     private final UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username + " was not found."));
-        return new User(user.getEmail(), user.getPassword(), Collections.emptyList());
+    public User findById(Long id){
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User #" + id + " was not found."));
     }
 }

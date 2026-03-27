@@ -26,7 +26,7 @@ public class Comment {
 
     @CreationTimestamp
     @Column(name = "date_created", updatable = false)
-    private LocalDateTime dateCreated;
+    private LocalDateTime timeCreated;
 
     @ManyToOne
     @JoinColumn(name="user_id")

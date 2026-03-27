@@ -33,11 +33,17 @@ public class User {
     @Column(name = "date_created", updatable = false)
     private LocalDate dateCreated;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "following")
+    private List<Follow> followers;
+
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> following;
 
     public void addPost(Post post){
         posts.add(post);
@@ -52,5 +58,10 @@ public class User {
     public void addComment(Comment comment){
         comments.add(comment);
         comment.setUser(this);
+    }
+
+    public void removeComment(Comment comment){
+        comments.remove(comment);
+        comment.setUser(null);
     }
 }

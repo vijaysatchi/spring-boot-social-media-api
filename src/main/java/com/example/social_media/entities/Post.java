@@ -33,7 +33,7 @@ public class Post {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Comment> comments;
 
     public void addComment(Comment comment){
