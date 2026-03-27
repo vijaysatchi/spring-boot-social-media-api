@@ -51,7 +51,7 @@ public class CommentController {
     @PostMapping("/comment/{id}")
     public ResponseEntity<CommentDto> createComment(
             @PathVariable Long id,
-            @RequestBody CreateCommentRequest request,
+            @RequestBody @Valid CreateCommentRequest request,
             UriComponentsBuilder uriBuilder) {
         var comment = commentMapper.toEntity(request);
         var newComment = commentService.createComment(id, request.getUserId(), comment);
