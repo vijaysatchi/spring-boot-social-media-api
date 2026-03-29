@@ -1,5 +1,7 @@
 package com.example.social_media.filters;
 
+import com.example.social_media.repositories.UserRepository;
+import com.example.social_media.services.CustomUserDetailsService;
 import com.example.social_media.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,14 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
-import java.util.Collections;
 
 @Component
 @AllArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,17 +34,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println("jwt.subject: " + jwt.getSubject());
-
+        var user = userDetailsService.loadUserByUserId(jwt.getUserId());
         var authentication = new UsernamePasswordAuthenticationToken(
-                jwt.getSubject(),
+                user,
                 null,
-                Collections.emptyList()
+                user.getAuthorities()
         );
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         filterChain.doFilter(request, response);
     }
 }

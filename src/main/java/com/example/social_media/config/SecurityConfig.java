@@ -1,6 +1,7 @@
 package com.example.social_media.config;
 
 import com.example.social_media.filters.JwtAuthFilter;
+import com.example.social_media.services.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
@@ -36,10 +37,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(c -> c
                 .requestMatchers(HttpMethod.GET,"/api/post/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/comment/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/user/**").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/user").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/validate").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.GET,"/feed/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/post/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE,"/api/user/**/unfollow/**").permitAll() /*remove once auth*/
+                .requestMatchers(HttpMethod.POST,"/api/user/**/follow/**").permitAll() /*remove once auth*/
+                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/").permitAll()
                 .anyRequest().authenticated()
             )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

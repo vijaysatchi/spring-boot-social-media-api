@@ -14,12 +14,8 @@ public class Jwt{
         this.secretKey = secretKey;
     }
 
-    public String getSubject(){
-        return claims.getSubject();
-    }
-
     public Long getUserId(){
-        return Long.valueOf(claims.getId());
+        return Long.valueOf(claims.getSubject());
     }
 
     public boolean isExpired (){
