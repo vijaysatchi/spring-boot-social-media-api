@@ -21,12 +21,15 @@ public class Comment {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "text")
-    private String text;
+    @Column(name = "content")
+    private String content;
 
     @CreationTimestamp
     @Column(name = "date_created", updatable = false)
     private LocalDateTime timeCreated;
+
+    @Column(name = "like_count")
+    private Long likeCount;
 
     @ManyToOne
     @JoinColumn(name="user_id")

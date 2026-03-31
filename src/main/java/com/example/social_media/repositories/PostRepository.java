@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByUserId(Long userId, Pageable pageable);
     @Query("""
-        SELECT p 
-        FROM POST p
+        SELECT p
+        FROM Post p
         JOIN Follow f ON p.user = f.following
         WHERE f.follower.id = :followerId
     """)

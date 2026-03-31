@@ -29,6 +29,9 @@ public class Post {
     @Column(name = "date_created", updatable = false)
     private LocalDateTime timeCreated;
 
+    @Column(name = "like_count")
+    private Long likeCount;
+
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;

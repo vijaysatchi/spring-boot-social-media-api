@@ -9,6 +9,7 @@ public class PostDto {
     private Long id;
     private String caption;
     private LocalDateTime timeCreated;
+    private long likeCount;
 
     private Long userId;
     private String userName;

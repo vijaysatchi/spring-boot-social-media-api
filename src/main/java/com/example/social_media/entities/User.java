@@ -38,6 +38,18 @@ public class User implements UserDetails {
     @Column(name = "date_created", updatable = false)
     private LocalDate dateCreated;
 
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
+
+    @Column(name = "bio")
+    private String bio;
+
+    @Column(name = "followers_count")
+    private int followersCount;
+
+    @Column(name = "following_count")
+    private int followingCount;
+
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Post> posts;
 
