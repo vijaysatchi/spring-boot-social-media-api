@@ -1,10 +1,10 @@
 package com.example.social_media.filters;
 
-import com.example.social_media.repositories.UserRepository;
 import com.example.social_media.services.CustomUserDetailsService;
 import com.example.social_media.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -23,18 +23,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+//        var header = request.getHeader("Authorization");
+//        if (header == null || !header.startsWith("Bearer ")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+
+        String token = null; //= header.substring(7);
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("accessToken")) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if(token == null){
             filterChain.doFilter(request, response);
             return;
         }
-        String token = header.substring(7);
+
         var jwt = jwtService.parseToken(token);
         if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-        var user = userDetailsService.loadUserByUserId(jwt.getUserId());
+
+        var user = userDetailsService.getCustomUserDetails(jwt.getUserId(), jwt.getClaim("email"));
         var authentication = new UsernamePasswordAuthenticationToken(
                 user,
                 null,

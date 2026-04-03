@@ -2,22 +2,20 @@ package com.example.social_media.controllers;
 
 import com.example.social_media.config.JwtConfig;
 import com.example.social_media.dtos.LoginRequestDto;
+import com.example.social_media.dtos.RegisterUserRequest;
+import com.example.social_media.dtos.UserDto;
+import com.example.social_media.entities.CustomUserDetails;
 import com.example.social_media.entities.User;
-import com.example.social_media.repositories.UserRepository;
 import com.example.social_media.services.AuthService;
-import com.example.social_media.services.JwtService;
 import jakarta.servlet.http.Cookie;
+import org.springframework.http.ResponseCookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,19 +26,42 @@ public class AuthController {
     private JwtConfig jwtConfig;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto request, HttpServletResponse response){
-        var userId = authService.login(request);
-        var accessToken = authService.getAccessToken(userId);
-        var refreshToken = authService.getRefreshToken(userId);
+    public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequestDto request, HttpServletResponse response) {
+        var userDto = authService.login(request);
+        var accessToken = authService.getAccessToken(userDto.getId(), userDto.getEmail());
+        var refreshToken = authService.getRefreshToken(userDto.getId());
 
-        var cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/api/auth/refresh");
-        cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        response.addHeader(
+                "Set-Cookie",
+                "accessToken=" + accessToken +
+                        "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getAccessTokenExpiration() +
+                        "; SameSite=Strict"
+        );
 
-        return ResponseEntity.ok(accessToken);
+        response.addHeader(
+                "Set-Cookie",
+                "refreshToken=" + refreshToken +
+                        "; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=" + jwtConfig.getRefreshTokenExpiration() +
+                        "; SameSite=Strict"
+        );
+
+        return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+
+        response.addHeader(
+                "Set-Cookie",
+                "accessToken=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=Strict"
+        );
+
+        response.addHeader(
+                "Set-Cookie",
+                "refreshToken=; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=0; SameSite=Strict"
+        );
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")
@@ -58,8 +79,19 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/me")
-    public ResponseEntity<?> me(@AuthenticationPrincipal User user){
-        return ResponseEntity.ok("Hello " + user.getUsername() + "! :D");
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(@AuthenticationPrincipal CustomUserDetails user){
+        var userDto = authService.getAuthenticatedUser(user);
+        return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> registerUser(
+            @RequestBody @Valid RegisterUserRequest request,
+            UriComponentsBuilder uriComponentsBuilder
+    ){
+        var userDto = authService.registerUser(request);
+        var uri = uriComponentsBuilder.path("/api/user/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 }

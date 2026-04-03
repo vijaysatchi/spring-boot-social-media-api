@@ -1,6 +1,5 @@
 package com.example.social_media.services;
 
-import com.example.social_media.dtos.RegisterUserRequest;
 import com.example.social_media.dtos.UpdateUserRequest;
 import com.example.social_media.dtos.UserDto;
 import com.example.social_media.entities.Follow;
@@ -21,7 +20,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final UserMapper userMapper;
-    private PasswordEncoder passwordEncoder;
 
     public User findById(Long id){
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User #" + id + " was not found."));
@@ -35,15 +33,6 @@ public class UserService {
     public void delete(Long id) {
         findById(id); // to return 404 if user doesn't exist
         userRepository.deleteById(id);
-    }
-
-    public UserDto registerUser(RegisterUserRequest request) {
-        if(userRepository.existsByEmail(request.getEmail()))
-            throw new BadRequestException("Email already exists.");
-        var user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        var newUser = userRepository.save(user);
-        return userMapper.toDto(newUser);
     }
 
     public void follow(long id, long targetId) {

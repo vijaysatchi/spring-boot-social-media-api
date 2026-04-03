@@ -35,18 +35,22 @@ public class SecurityConfig {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(c -> c
+                                                        // basic visitor privileges
                 .requestMatchers(HttpMethod.GET,"/api/post/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/comment/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/user/**").permitAll()
-                .requestMatchers(HttpMethod.POST,"/api/user").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/user").permitAll()
+                                                        // auth
+                .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST,"/api/auth/validate").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.GET,"/feed/**").permitAll()
+                                                        // pages
+                .requestMatchers(HttpMethod.GET,"/feed/global").permitAll()
+                .requestMatchers(HttpMethod.GET,"/login").permitAll()
+                .requestMatchers(HttpMethod.GET,"/register").permitAll()
                 .requestMatchers(HttpMethod.GET,"/post/**").permitAll()
-                .requestMatchers(HttpMethod.DELETE,"/api/user/**/unfollow/**").permitAll() /*remove once auth*/
-                .requestMatchers(HttpMethod.POST,"/api/user/**/follow/**").permitAll() /*remove once auth*/
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                                                        // static assets
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                                                        // home page
                 .requestMatchers(HttpMethod.GET,"/").permitAll()
                 .anyRequest().authenticated()
             )
