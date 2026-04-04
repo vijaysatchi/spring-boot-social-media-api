@@ -22,10 +22,10 @@ public class PostController {
 
     @GetMapping("/post/{id}")
     public ResponseEntity<PostDto> getPostDto(
-            @PathVariable Long id,
+            @PathVariable("id") Long postId,
             @AuthenticationPrincipal CustomUserDetails user){
         Long viewerId = user == null ? null : user.getId();
-        var postDto = postService.getPostDtoById(id, viewerId);
+        var postDto = postService.getPostDtoById(postId, viewerId);
         return ResponseEntity.ok(postDto);
     }
 
@@ -64,7 +64,6 @@ public class PostController {
     public ResponseEntity<Boolean> isPostLikedByUser(
             @PathVariable("id") Long post_id,
             @PathVariable("user_id") Long user_id
-//            @AuthenticationPrincipal CustomUserDetails user
     ){
         var isLiked = postService.isLikedByUser(user_id, post_id);
         return ResponseEntity.ok(isLiked);
@@ -72,11 +71,11 @@ public class PostController {
 
     @PostMapping("/post")
     public ResponseEntity<PostDto> createPost(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody @Valid CreatePostRequest request,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        var postDto = postService.createPost(request, user);
+        var postDto = postService.createPost(request, user.getId());
         var uri = uriComponentsBuilder.path("/api/post/{id}").buildAndExpand(postDto.getId()).toUri();
         return ResponseEntity.created(uri).body(postDto);
     }
@@ -91,17 +90,21 @@ public class PostController {
 
     @PatchMapping("/post/{id}")
     public ResponseEntity<PostDto> updatePost(
-            @PathVariable Long id,
-            @RequestBody @Valid EditPostRequest request
+            @PathVariable("id") Long postId,
+            @RequestBody @Valid EditPostRequest request,
+            @AuthenticationPrincipal CustomUserDetails user
     ){
 
-        var postDto = postService.update(id, request);
+        var postDto = postService.update(postId, user.getId(), request);
         return ResponseEntity.ok(postDto);
     }
 
     @DeleteMapping("/post/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id){
-        postService.deleteById(id);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable("id") Long postId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ){
+        postService.deleteById(postId, user.getId());
         return ResponseEntity.ok().build();
     }
 }

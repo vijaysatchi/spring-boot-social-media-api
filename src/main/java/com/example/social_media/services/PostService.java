@@ -22,6 +22,7 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private UserService userService;
 
     public Post findById(Long id){
         return postRepository.findById(id).orElseThrow(() ->
@@ -63,23 +64,30 @@ public class PostService {
                 .toList();
     }
 
-    public PostDto createPost(CreatePostRequest request, User user) {
+    public PostDto createPost(CreatePostRequest request, Long userId) {
         var post = postMapper.toEntity(request);
+        var user = userService.findById(userId);
         user.addPost(post);
         return postMapper.toDto(postRepository.save(post));
     }
 
     @Transactional
-    public PostDto update(Long id, EditPostRequest request) {
-        var post = findById(id);
+    public PostDto update(Long postId, Long userId, EditPostRequest request) {
+        var post = findById(postId);
+        if(!post.getUser().getId().equals(userId)){
+            throw new BadRequestException("You cannot edit this post!");
+        }
         postMapper.update(request, post);
         return postMapper.toDto(post);
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Long id, Long userId) {
         var post = findById(id);
         var user = post.getUser();
+        if(!user.getId().equals(userId)){
+            throw new BadRequestException("You cannot delete this post!");
+        }
         user.removePost(post);
         postRepository.deleteById(id);
     }
