@@ -26,7 +26,7 @@ public class Comment {
 
     @CreationTimestamp
     @Column(name = "date_created", updatable = false)
-    private LocalDateTime timeCreated;
+    private LocalDateTime dateCreated;
 
     @Column(name = "like_count")
     private Long likeCount;

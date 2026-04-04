@@ -4,6 +4,8 @@ import com.example.social_media.dtos.CommentDto;
 import com.example.social_media.dtos.CreateCommentRequest;
 import com.example.social_media.dtos.EditCommentRequest;
 import com.example.social_media.entities.Comment;
+import com.example.social_media.entities.User;
+import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.CommentMapper;
 import com.example.social_media.repositories.CommentRepository;
@@ -33,9 +35,8 @@ public class CommentService {
         return commentMapper.toDto(comment);
     }
 
-    public CommentDto createComment(Long postId, Long userId, CreateCommentRequest request){
+    public CommentDto createComment(Long postId, User user, CreateCommentRequest request){
         var post = postService.findById(postId);
-        var user = userService.findById(userId);
         var comment = commentMapper.toEntity(request);
 
         post.addComment(comment);
@@ -45,13 +46,14 @@ public class CommentService {
         return commentMapper.toDto(newComment);
     }
 
-    public List<CommentDto> getCommentsByPostId(Long id, Integer page) {
-        postService.findById(id);
-        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "timeCreated"));
-
-        return commentRepository.findByPostId(id, pageRequest)
+    public List<CommentDto> getCommentsByPostId(Long postId, Long viewerId, Integer page) {
+        postService.findById(postId);
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "dateCreated"));
+        if(viewerId == null) return commentRepository.findAllByPostId(postId, pageRequest)
                 .stream()
                 .map(commentMapper::toDto)
+                .toList();
+        return commentRepository.findAllByPostIdWithIsLiked(postId, viewerId, pageRequest)
                 .toList();
     }
 
@@ -70,5 +72,25 @@ public class CommentService {
         var post = comment.getPost();
         post.removeComment(comment);
         commentRepository.deleteById(id);
+    }
+
+    public boolean isLikedByUser(Long userId, Long commentId) {
+        var liked = commentRepository.isLikedByUser(userId, commentId);
+        System.out.println(liked);
+        return 1L == liked;
+    }
+
+    @Transactional
+    public void toggleLike(Long user_id, Long comment_id) {
+        var comment = commentRepository.findById(comment_id).orElseThrow(() ->
+                new BadRequestException("Comment #" + comment_id + " not found."));
+        if(isLikedByUser(user_id, comment_id)) {
+            commentRepository.removeLike(user_id, comment_id);
+            comment.setLikeCount(comment.getLikeCount() - 1);
+        }else{
+            commentRepository.addLike(user_id, comment_id);
+            comment.setLikeCount(comment.getLikeCount() + 1);
+        }
+        commentRepository.save(comment);
     }
 }
