@@ -30,7 +30,7 @@ public class Post {
     private LocalDateTime timeCreated;
 
     @Column(name = "like_count")
-    private Long likeCount;
+    private Long likeCount = 0L;
 
     @ManyToOne
     @JoinColumn(name="user_id")

@@ -29,7 +29,7 @@ public class Comment {
     private LocalDateTime dateCreated;
 
     @Column(name = "like_count")
-    private Long likeCount;
+    private Long likeCount = 0L;
 
     @ManyToOne
     @JoinColumn(name="user_id")

@@ -61,7 +61,7 @@ public class CommentService {
     @Transactional
     public CommentDto updateComment(Long commentId, Long userId, EditCommentRequest request) {
         var comment = findById(commentId);
-        if(comment.getUser().getId() != userId)
+        if(!comment.getUser().getId().equals(userId))
             throw new BadRequestException("You cannot edit this comment!");
         commentMapper.update(request, comment);
         return commentMapper.toDto(comment);
@@ -71,7 +71,7 @@ public class CommentService {
     public void deleteComment(Long id, Long userId) {
         var comment = findById(id);
         var user = comment.getUser();
-        if(user.getId() != userId)
+        if(!user.getId().equals(userId))
             throw new BadRequestException("You cannot delete this comment!");
         user.removeComment(comment);
         var post = comment.getPost();
@@ -80,9 +80,7 @@ public class CommentService {
     }
 
     public boolean isLikedByUser(Long userId, Long commentId) {
-        var liked = commentRepository.isLikedByUser(userId, commentId);
-        System.out.println(liked);
-        return 1L == liked;
+        return 1L == commentRepository.isLikedByUser(userId, commentId);
     }
 
     @Transactional

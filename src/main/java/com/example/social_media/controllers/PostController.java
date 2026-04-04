@@ -55,7 +55,6 @@ public class PostController {
             @AuthenticationPrincipal CustomUserDetails user
     ){
         Long viewerId = user == null ? null : user.getId();
-        System.out.println("viewerId: " + viewerId);
         var postsList = postService.getUsersPosts(id, page, viewerId);
         return ResponseEntity.ok(postsList);
     }
