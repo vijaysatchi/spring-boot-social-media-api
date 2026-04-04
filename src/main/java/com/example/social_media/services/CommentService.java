@@ -35,9 +35,10 @@ public class CommentService {
         return commentMapper.toDto(comment);
     }
 
-    public CommentDto createComment(Long postId, User user, CreateCommentRequest request){
+    public CommentDto createComment(Long postId, Long userId, CreateCommentRequest request){
         var post = postService.findById(postId);
         var comment = commentMapper.toEntity(request);
+        var user = userService.findById(userId);
 
         post.addComment(comment);
         user.addComment(comment);
@@ -58,16 +59,20 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDto updateComment(Long id, EditCommentRequest request) {
-        var comment = findById(id);
+    public CommentDto updateComment(Long commentId, Long userId, EditCommentRequest request) {
+        var comment = findById(commentId);
+        if(comment.getUser().getId() != userId)
+            throw new BadRequestException("You cannot edit this comment!");
         commentMapper.update(request, comment);
         return commentMapper.toDto(comment);
     }
 
     @Transactional
-    public void deleteComment(Long id) {
+    public void deleteComment(Long id, Long userId) {
         var comment = findById(id);
         var user = comment.getUser();
+        if(user.getId() != userId)
+            throw new BadRequestException("You cannot delete this comment!");
         user.removeComment(comment);
         var post = comment.getPost();
         post.removeComment(comment);

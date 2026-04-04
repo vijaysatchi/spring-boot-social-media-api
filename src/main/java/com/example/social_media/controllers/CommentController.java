@@ -41,11 +41,11 @@ public class CommentController {
 
     @PostMapping("/post/{id}/comment")
     public ResponseEntity<CommentDto> createComment(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable("id") Long postId,
             @RequestBody @Valid CreateCommentRequest request,
             UriComponentsBuilder uriBuilder) {
-        var commentDto = commentService.createComment(id, user, request);
+        var commentDto = commentService.createComment(postId, user.getId(), request);
         var uri =  uriBuilder.path("/api/comment/{id}").buildAndExpand(commentDto.getId()).toUri();
         return ResponseEntity.created(uri).body(commentDto);
     }
@@ -60,19 +60,19 @@ public class CommentController {
 
     @PatchMapping("/comment/{id}")
     public ResponseEntity<CommentDto> updateComment(
-            @PathVariable Long id,
+            @PathVariable("id") Long commentId,
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody @Valid EditCommentRequest request){
-        var updatedComment = commentService.updateComment(id, request);
+        var updatedComment = commentService.updateComment(commentId, user.getId(), request);
         return ResponseEntity.ok(updatedComment);
     }
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Long id,
+            @PathVariable("id") Long commentId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        commentService.deleteComment(id);
+        commentService.deleteComment(commentId, user.getId());
         return ResponseEntity.ok().build();
     }
 }
