@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
 
     // Handle validation errors (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,7 +36,7 @@ public class GlobalExceptionHandler {
     // Handle bad credentials (auth error)
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex){
-        return buildErrorResponse(ex.getLocalizedMessage(), HttpStatus.UNAUTHORIZED);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     // Handle resource-not-found errors (controller)
@@ -50,8 +48,9 @@ public class GlobalExceptionHandler {
     // Handle bad request errors (controller)
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex){
-        return buildErrorResponse(ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
 //    //Generic error handler
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<Map<String, Object>> handleException(Exception ex){
