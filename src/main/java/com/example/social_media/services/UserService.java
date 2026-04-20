@@ -84,7 +84,7 @@ public class UserService {
     @Transactional
     public UserProfileDto updateUser(Long id, UpdateUserProfileRequest request) {
         var user = findById(id);
-        if(request.getName() != null && userRepository.existsByName(request.getName())){
+        if(!request.getName().equals(user.getName()) && userRepository.existsByName(request.getName())){
             throw new BadRequestException("Username already exists.");
         }
         userMapper.updateEntity(request, user);

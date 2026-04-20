@@ -19,18 +19,20 @@ public class GlobalExceptionHandler {
     // Handle validation errors (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex){
-        var errors = new ArrayList<Map<String, String>>();
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            Map<String, String> errorMap = Map.of(
-                    "field", error.getField(),
-                    "message", error.getDefaultMessage()
-            );
-            errors.add(errorMap);
-        });
+//        var errors = new ArrayList<Map<String, String>>();
+//        ex.getBindingResult().getFieldErrors().forEach((error) -> {
+//            Map<String, String> errorMap = Map.of(
+//                    "field", error.getField(),
+//                    "message", error.getDefaultMessage()
+//            );
+//            errors.add(errorMap);
+//        });
 
-        var response = buildErrorResponse("Validation failed", HttpStatus.BAD_REQUEST);
-        response.getBody().put("errors", errors);
-        return ResponseEntity.badRequest().body(response.getBody());
+        var errorString = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst().get().getDefaultMessage();
+        int numErrors = ex.getBindingResult().getFieldErrors().size();
+        if(numErrors > 1) errorString += ", plus "  + (numErrors - 1) + " more error(s)...";
+        return buildErrorResponse(errorString, HttpStatus.BAD_REQUEST);
     }
 
     // Handle bad credentials (auth error)
