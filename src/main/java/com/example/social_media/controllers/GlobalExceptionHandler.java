@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
 
 @ControllerAdvice
@@ -28,8 +27,9 @@ public class GlobalExceptionHandler {
 //            errors.add(errorMap);
 //        });
 
-        var errorString = ex.getBindingResult().getFieldErrors().stream()
-                .findFirst().get().getDefaultMessage();
+        var error = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst().orElseThrow(() -> new BadRequestException("Something went wrong"));
+        var errorString = error.getDefaultMessage();
         int numErrors = ex.getBindingResult().getFieldErrors().size();
         if(numErrors > 1) errorString += ", plus "  + (numErrors - 1) + " more error(s)...";
         return buildErrorResponse(errorString, HttpStatus.BAD_REQUEST);

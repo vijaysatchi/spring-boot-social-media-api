@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: store
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    show-sql: false
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  jwt:
+    secret: ${JWT_SECRET}
+    accessTokenExpiration: 900
+    refreshTokenExpiration: 604800
