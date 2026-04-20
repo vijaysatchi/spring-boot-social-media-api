@@ -1,10 +1,9 @@
 package com.example.social_media.services;
 
-import com.example.social_media.dtos.LoginRequestDto;
-import com.example.social_media.dtos.RegisterUserRequest;
-import com.example.social_media.dtos.UserDto;
+import com.example.social_media.dtos.users.LoginRequestDto;
+import com.example.social_media.dtos.users.RegisterUserRequest;
+import com.example.social_media.dtos.users.UserDto;
 import com.example.social_media.entities.CustomUserDetails;
-import com.example.social_media.entities.User;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.mappers.UserMapper;
 import com.example.social_media.repositories.UserRepository;
@@ -15,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -35,7 +33,7 @@ public class AuthService {
                 )
         );
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() ->
-                new BadCredentialsException("Invalid email or password"));
+                new BadRequestException("Invalid email or password"));
         return userMapper.toDto(user);
     }
 
@@ -47,27 +45,13 @@ public class AuthService {
         return jwtService.generateRefreshToken(id, null).toString();
     }
 
-    public String refresh(String refreshToken) {
-        var jwt = jwtService.parseToken(refreshToken);
-        if(jwt == null || jwt.isExpired()){
-            throw new BadCredentialsException("You must log in; invalid refresh token.");
-        }
-        return jwtService.generateAccessToken(jwt.getUserId(), null).toString();
-    }
-
-    public void validate(String authorization) {
-        var token = authorization.substring(7);
-        var jwt = jwtService.parseToken(token);
-        if(jwt == null){
-            throw new BadCredentialsException("Invalid token; invalid email or password.");
-        }
-    }
-
     public UserDto registerUser(RegisterUserRequest request) {
         if(userRepository.existsByEmail(request.getEmail()))
-            throw new BadCredentialsException("Email already exists.");
+            throw new BadRequestException("Email already exists.");
+        if(userRepository.existsByName(request.getName()))
+            throw new BadRequestException("Name already exists.");
         var user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         var newUser = userRepository.save(user);
         return userMapper.toDto(newUser);
     }

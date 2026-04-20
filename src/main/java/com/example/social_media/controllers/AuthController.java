@@ -78,15 +78,6 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<?> validate(
-            @Valid @RequestBody LoginRequestDto request,
-            @RequestHeader("Authorization") String authorization
-    ){
-        authService.validate(authorization);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(@AuthenticationPrincipal CustomUserDetails user){
         var userDto = authService.getAuthenticatedUser(user);
