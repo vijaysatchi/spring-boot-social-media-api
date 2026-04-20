@@ -4,11 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,25 +39,28 @@ public class User{
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
+    @Column(name = "banner_colour")
+    private String bannerColour;
+
     @Column(name = "bio")
     private String bio;
 
-    @Column(name = "followers_count")
-    private int followersCount;
+    @Column(name = "followers_count", nullable = false)
+    private Long followersCount = 0L;
 
-    @Column(name = "following_count")
-    private int followingCount;
+    @Column(name = "following_count", nullable = false)
+    private Long followingCount = 0L;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "following", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "following", orphanRemoval = true)
     private List<Follow> followers;
 
-    @OneToMany(mappedBy = "follower",  cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "follower", orphanRemoval = true)
     private List<Follow> following;
 
     @ManyToMany
@@ -104,7 +103,14 @@ public class User{
     public Follow follow(User userToFollow){
         Follow follow = new Follow(this, userToFollow);
         followers.add(follow);
+        this.followingCount++;
+        userToFollow.followersCount++;
         userToFollow.following.add(follow);
         return follow;
+    }
+
+    public void unfollow(User userToUnfollow){
+        this.followingCount--;
+        userToUnfollow.followersCount--;
     }
 }
