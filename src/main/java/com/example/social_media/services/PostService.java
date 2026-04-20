@@ -1,10 +1,9 @@
 package com.example.social_media.services;
 
-import com.example.social_media.dtos.CreatePostRequest;
-import com.example.social_media.dtos.EditPostRequest;
-import com.example.social_media.dtos.PostDto;
+import com.example.social_media.dtos.posts.CreatePostRequest;
+import com.example.social_media.dtos.posts.EditPostRequest;
+import com.example.social_media.dtos.posts.PostDto;
 import com.example.social_media.entities.Post;
-import com.example.social_media.entities.User;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.PostMapper;
@@ -98,8 +97,9 @@ public class PostService {
 
     @Transactional
     public void togglePostLike(Long postId, Long userId) {
-        var post = postRepository.findById(postId).orElseThrow(() ->
-                new BadRequestException("Post #" + postId + " not found."));
+//        var post = postRepository.findById(postId).orElseThrow(() ->
+//                new BadRequestException("Post #" + postId + " not found."));
+        var post = findById(postId);
         if(isLikedByUser(postId, userId)){
             postRepository.removeLike(userId, postId);
             post.setLikeCount(post.getLikeCount() - 1);

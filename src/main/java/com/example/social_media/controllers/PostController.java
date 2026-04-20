@@ -1,9 +1,8 @@
 package com.example.social_media.controllers;
 
-import com.example.social_media.dtos.CreatePostRequest;
-import com.example.social_media.dtos.EditPostRequest;
-import com.example.social_media.dtos.PostDto;
-import com.example.social_media.entities.User;
+import com.example.social_media.dtos.posts.CreatePostRequest;
+import com.example.social_media.dtos.posts.EditPostRequest;
+import com.example.social_media.dtos.posts.PostDto;
 import com.example.social_media.entities.CustomUserDetails;
 import com.example.social_media.services.PostService;
 import jakarta.validation.Valid;
@@ -51,7 +50,7 @@ public class PostController {
     @GetMapping("/user/{id}/post/{page}")
     public ResponseEntity<List<PostDto>> getPostsFromUser(
             @PathVariable(name="id") Long id,
-            @RequestParam(required = false, defaultValue = "0", name="page") Integer page,
+            @PathVariable(name="page") Integer page,
             @AuthenticationPrincipal CustomUserDetails user
     ){
         Long viewerId = user == null ? null : user.getId();
@@ -93,7 +92,6 @@ public class PostController {
             @RequestBody @Valid EditPostRequest request,
             @AuthenticationPrincipal CustomUserDetails user
     ){
-
         var postDto = postService.update(postId, user.getId(), request);
         return ResponseEntity.ok(postDto);
     }

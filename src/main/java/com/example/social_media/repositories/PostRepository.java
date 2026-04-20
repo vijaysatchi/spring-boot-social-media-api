@@ -1,6 +1,6 @@
 package com.example.social_media.repositories;
 
-import com.example.social_media.dtos.PostDto;
+import com.example.social_media.dtos.posts.PostDto;
 import com.example.social_media.entities.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +14,34 @@ import org.springframework.stereotype.Repository;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByUserId(Long userId, Pageable pageable);
 
+    @Modifying
+    @Query(value = """
+    delete from post_likes pl
+        where pl.user_id = :userId
+    """, nativeQuery = true)
+    void deletePostLikesByUserId(@Param("userId") Long userId);
+    void deleteByUserId(Long userId);
+
+    @Modifying
+    @Query(value = """
+    update posts p
+    join post_likes pl on p.id = pl.post_id
+        set p.like_count = p.like_count - 1
+    where pl.user_id = :userId
+    """, nativeQuery = true)
+    void removeDeletedUsersLikedPosts(@Param("userId") Long userId);
+
     @Query("""
-    select new com.example.social_media.dtos.PostDto(
+    select new com.example.social_media.dtos.posts.PostDto(
         p.id,
         p.caption,
         p.timeCreated,
         p.likeCount,
+        p.updatedAt,
         case when pl.userId is not null then true else false end,
         u.id,
-        u.name
+        u.name,
+        u.profilePictureUrl
     )
     from Post p
     left join p.user u
@@ -34,14 +53,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostDto> findAllByFollowerIdWithIsLiked(@Param("followerId") Long followerId, Pageable pageable);
 
     @Query(value = """
-    select new com.example.social_media.dtos.PostDto(
+    select new com.example.social_media.dtos.posts.PostDto(
         p.id,
         p.caption,
         p.timeCreated,
         p.likeCount,
+        p.updatedAt,
         case when pl.userId is not null then true else false end,
         u.id,
-        u.name
+        u.name,
+        u.profilePictureUrl
     )
     from Post p
     left join p.user u
@@ -53,14 +74,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostDto> findAllByUserIdWithIsLiked(@Param("userId") long userId, @Param("viewerId") long viewerId, Pageable pageRequest);
 
     @Query("""
-    select new com.example.social_media.dtos.PostDto(
+    select new com.example.social_media.dtos.posts.PostDto(
         p.id,
         p.caption,
         p.timeCreated,
         p.likeCount,
+        p.updatedAt,
         case when pl.userId is not null then true else false end,
         u.id,
-        u.name
+        u.name,
+        u.profilePictureUrl
     )
     from Post p
     left join p.user u
@@ -71,14 +94,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostDto> findAllWithIsLiked(@Param("viewerId") Long viewerId, Pageable pageRequest);
 
     @Query("""
-    select new com.example.social_media.dtos.PostDto(
+    select new com.example.social_media.dtos.posts.PostDto(
         p.id,
         p.caption,
         p.timeCreated,
         p.likeCount,
+        p.updatedAt,
         case when pl.userId is not null then true else false end,
         u.id,
-        u.name
+        u.name,
+        u.profilePictureUrl
     )
     from Post p
         left join p.user u
@@ -98,4 +123,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query(value = "delete from post_likes where user_id = :user_id and post_id = :post_id", nativeQuery = true)
     void removeLike(@Param("user_id") Long user_id, @Param("post_id") Long post_id);
+
 }
