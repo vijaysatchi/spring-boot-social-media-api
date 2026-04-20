@@ -1,10 +1,9 @@
 package com.example.social_media.controllers;
 
-import com.example.social_media.dtos.CommentDto;
-import com.example.social_media.dtos.CreateCommentRequest;
-import com.example.social_media.dtos.EditCommentRequest;
+import com.example.social_media.dtos.comments.CommentDto;
+import com.example.social_media.dtos.comments.CreateCommentRequest;
+import com.example.social_media.dtos.comments.EditCommentRequest;
 import com.example.social_media.entities.CustomUserDetails;
-import com.example.social_media.entities.User;
 import com.example.social_media.services.CommentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,19 +22,19 @@ public class CommentController {
 
 
     @GetMapping("/comment/{id}")
-    public ResponseEntity<CommentDto> getComment(@PathVariable Long id) {
-        var commentDto = commentService.getCommentById(id);
+    public ResponseEntity<CommentDto> getComment(@PathVariable("id") Long commentId) {
+        var commentDto = commentService.getCommentDtoById(commentId);
         return ResponseEntity.ok(commentDto);
     }
 
     @GetMapping("/post/{id}/comments")
     public ResponseEntity<List<CommentDto>> getCommentsOfPost(
-            @PathVariable Long id,
+            @PathVariable("id") Long postId,
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(required = false, defaultValue = "0", name="page") Integer page
     ) {
         Long viewer = user == null ? null : user.getId();
-        var comments = commentService.getCommentsByPostId(id, viewer, page);
+        var comments = commentService.getCommentsByPostId(postId, viewer, page);
         return ResponseEntity.ok(comments);
     }
 
@@ -52,9 +51,9 @@ public class CommentController {
 
     @PostMapping("/comment/{id}/like")
     public ResponseEntity<Void> toggleLike(
-            @PathVariable("id") Long comment_id,
+            @PathVariable("id") Long commentId,
             @AuthenticationPrincipal CustomUserDetails user){
-        commentService.toggleLike(user.getId(), comment_id);
+        commentService.toggleLike(user.getId(), commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -63,8 +62,8 @@ public class CommentController {
             @PathVariable("id") Long commentId,
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody @Valid EditCommentRequest request){
-        var updatedComment = commentService.updateComment(commentId, user.getId(), request);
-        return ResponseEntity.ok(updatedComment);
+        var commentDto = commentService.updateComment(commentId, user.getId(), request);
+        return ResponseEntity.ok(commentDto);
     }
 
     @DeleteMapping("/comment/{id}")

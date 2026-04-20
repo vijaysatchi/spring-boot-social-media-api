@@ -1,4 +1,4 @@
-package com.example.social_media.dtos;
+package com.example.social_media.dtos.comments;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

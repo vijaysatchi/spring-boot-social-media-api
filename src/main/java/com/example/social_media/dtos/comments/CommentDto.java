@@ -1,4 +1,4 @@
-package com.example.social_media.dtos;
+package com.example.social_media.dtos.comments;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ public class CommentDto {
     private String content;
     private LocalDateTime dateCreated;
     private Long likeCount;
+    private LocalDateTime updatedAt;
     private Boolean liked;
 
     private Long userId;
@@ -23,6 +24,7 @@ public class CommentDto {
                       String content,
                       LocalDateTime dateCreated,
                       Long likeCount,
+                      LocalDateTime updatedAt,
                       Boolean liked,
                       Long userId,
                       String userName,
@@ -31,9 +33,24 @@ public class CommentDto {
         this.content = content;
         this.dateCreated = dateCreated;
         this.likeCount = likeCount;
+        this.updatedAt = updatedAt;
         this.liked = liked;
         this.userId = userId;
         this.userName = userName;
         this.postId = postId;
+    }
+
+    @Override
+    public String toString() {
+        return "PostDto(" +
+                "id=" + id +
+                ", caption='" + content + '\'' +
+                ", timeCreated=" + dateCreated +
+                ", likeCount=" + likeCount +
+                ", updatedAt=" + updatedAt +
+                ", liked=" + liked +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ')';
     }
 }

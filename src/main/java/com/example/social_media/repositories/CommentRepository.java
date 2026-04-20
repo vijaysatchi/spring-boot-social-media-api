@@ -1,6 +1,6 @@
 package com.example.social_media.repositories;
 
-import com.example.social_media.dtos.CommentDto;
+import com.example.social_media.dtos.comments.CommentDto;
 import com.example.social_media.entities.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +14,31 @@ import org.springframework.stereotype.Repository;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostId(Long id, Pageable pageable);
 
+    void deleteByUserId(Long userId);
+
+    @Modifying
+    @Query(value = """
+    delete from comment_likes cl
+        where cl.user_id = :userId
+    """, nativeQuery = true)
+    void deleteCommentLikesByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value = """
+    update comments c
+        join comment_likes cl on c.id = cl.comment_id
+    set c.like_count = c.like_count - 1
+    where cl.user_id = :userId
+    """, nativeQuery = true)
+    void removeDeletedUsersLikedComments(@Param("userId") Long userId);
+
     @Query("""
-    select new com.example.social_media.dtos.CommentDto(
+    select new com.example.social_media.dtos.comments.CommentDto(
         c.id,
         c.content,
         c.dateCreated,
         c.likeCount,
+        c.updatedAt,
         case when cl.userId is not null then true else false end,
         u.id,
         u.name,

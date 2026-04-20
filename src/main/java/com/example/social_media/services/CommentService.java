@@ -1,10 +1,9 @@
 package com.example.social_media.services;
 
-import com.example.social_media.dtos.CommentDto;
-import com.example.social_media.dtos.CreateCommentRequest;
-import com.example.social_media.dtos.EditCommentRequest;
+import com.example.social_media.dtos.comments.CommentDto;
+import com.example.social_media.dtos.comments.CreateCommentRequest;
+import com.example.social_media.dtos.comments.EditCommentRequest;
 import com.example.social_media.entities.Comment;
-import com.example.social_media.entities.User;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.CommentMapper;
@@ -30,7 +29,7 @@ public class CommentService {
                 orElseThrow(() -> new ResourceNotFoundException("Comment #" + id + " not found."));
     }
 
-    public CommentDto getCommentById(Long id){
+    public CommentDto getCommentDtoById(Long id){
         var comment = findById(id);
         return commentMapper.toDto(comment);
     }
@@ -71,7 +70,7 @@ public class CommentService {
     public void deleteComment(Long id, Long userId) {
         var comment = findById(id);
         var user = comment.getUser();
-        if(!user.getId().equals(userId))
+        if (!user.getId().equals(userId))
             throw new BadRequestException("You cannot delete this comment!");
         user.removeComment(comment);
         var post = comment.getPost();
@@ -85,8 +84,7 @@ public class CommentService {
 
     @Transactional
     public void toggleLike(Long user_id, Long comment_id) {
-        var comment = commentRepository.findById(comment_id).orElseThrow(() ->
-                new BadRequestException("Comment #" + comment_id + " not found."));
+        var comment = findById(comment_id);
         if(isLikedByUser(user_id, comment_id)) {
             commentRepository.removeLike(user_id, comment_id);
             comment.setLikeCount(comment.getLikeCount() - 1);
