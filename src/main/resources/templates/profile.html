@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Profile')}"></head>
+<body>
+<div class="container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="profile-layout">
+        <main class="profile-main">
+            <div id="profileHeaderContainer"></div>
+            <div id="profilePostComposer" class="post-composer" style="display: none;">
+                <div class="post-composer-header">
+                    <img src="/images/default-avatar.png" id="composerAvatar" class="profile-pic" alt="Your avatar">
+                    <textarea id="postCaption" placeholder="What's happening?" maxlength="255" rows="2"></textarea>
+                </div>
+                <div class="post-composer-actions">
+                    <div class="char-count"><span id="charCount">0</span>/255</div>
+                    <button id="submitPostBtn" class="post-btn" disabled>Post</button>
+                </div>
+            </div>
+            <div class="user-posts-section">
+                <h2 class="posts-title">Posts</h2>
+                <div id="userPostsFeed" class="feed"></div>
+                <div id="profileSentinel" class="scroll-sentinel"></div>
+            </div>
+        </main>
+        <div id="compactProfileSidebar" class="compact-profile-sidebar"></div>
+    </div>
+</div>
+
+<!-- Followers Modal (hidden) -->
+<div id="followersModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Followers</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-tabs">
+            <button class="tab-btn active" data-tab="followers">Followers</button>
+            <button class="tab-btn" data-tab="following">Following</button>
+            <button class="tab-btn" data-tab="mutuals">Mutual</button>
+        </div>
+        <div class="modal-body">
+            <div id="followersList" class="user-list"></div>
+            <div id="followingList" class="user-list" style="display: none;"></div>
+            <div id="mutualList" class="user-list" style="display: none;"></div>
+            <div class="modal-loader" style="display: none;">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script type="module" th:inline="javascript">
+    window.__PAGE_DATA__ = {
+        profileUserId: /*[[${userId}]]*/ null
+    };
+    import('/js/main/profile.js').then(m => m.start());
+</script>
+</body>
+</html>
