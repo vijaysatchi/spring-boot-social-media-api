@@ -4,6 +4,16 @@ import { escapeHtml } from '../utils/dom.js';
 import { AVATAR_KEYS, getAvatarUrl, DEFAULT_AVATAR } from '../config/constants.js';
 import { logout } from "../auth/state.js";
 
+function disableBodyScroll() {
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = '0px';
+}
+
+function enableBodyScroll() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
 export function showEditProfileModal(user) {
     const existing = document.getElementById('editProfileModal');
     if (existing) existing.remove();
@@ -20,8 +30,6 @@ export function showEditProfileModal(user) {
     const modal = document.createElement('div');
     modal.id = 'editProfileModal';
     modal.className = 'modal edit-profile-modal';
-    modal.style.maxWidth = '95vw';
-    modal.style.margin = '0 auto';
     modal.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
@@ -86,7 +94,9 @@ export function showEditProfileModal(user) {
             </div>
         </div>
     `;
+
     document.body.appendChild(modal);
+    disableBodyScroll();
     modal.style.display = 'flex';
 
     // Color picker sync
@@ -114,11 +124,11 @@ export function showEditProfileModal(user) {
             opt.classList.add('selected');
             const avatarValue = opt.dataset.avatar;
             selectedAvatar = avatarValue === 'null' ? null : avatarValue;
-            console.log('Selected avatar:', selectedAvatar);
         });
     });
 
     const closeModal = () => {
+        enableBodyScroll();
         modal.remove();
     };
 
@@ -152,24 +162,21 @@ export function showEditProfileModal(user) {
                 avatarValue !== user.profilePictureUrl;
 
             if (profileChanged) {
+                const inputName = name === '' ? user.name : name;
                 const profileData = {
-                    name,
+                    name: inputName,
                     bio,
                     bannerColour,
                     profilePicture: avatarValue,
                     profilePictureUrl: avatarValue
                 };
 
-                console.log('Sending profile update:', profileData);
                 await fetchWithError('/api/user/profile', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(profileData)
                 });
                 profileUpdateSuccess = true;
-                console.log('Profile updated successfully');
-            } else {
-                console.log('No profile changes detected, skipping profile update');
             }
 
             // Update password
@@ -195,14 +202,13 @@ export function showEditProfileModal(user) {
                     body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
                 });
                 passwordUpdateSuccess = true;
-                console.log('Password updated successfully');
 
                 document.getElementById('currentPassword').value = '';
                 document.getElementById('newPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
             }
 
-            if(profileUpdateSuccess && passwordUpdateSuccess) showToast('Profile & Password updated successfully!', 'success');
+            if (profileUpdateSuccess && passwordUpdateSuccess) showToast('Profile & Password updated successfully!', 'success');
             else if (profileUpdateSuccess) showToast('Profile updated successfully!', 'success');
             else if (passwordUpdateSuccess) showToast('Password changed successfully!', 'success');
 
@@ -230,29 +236,33 @@ export function showEditProfileModal(user) {
         dialog.className = 'modal';
         dialog.style.display = 'flex';
         dialog.innerHTML = `
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h3>Delete Account</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="color: #e28b8b; margin-bottom: 1rem;">
-                    <strong>⚠️ WARNING:</strong> This action is irreversible.
-                </p>
-                <div class="form-group">
-                    <label>Enter your password:</label>
-                    <input type="password" id="deletePasswordInput" autocomplete="off">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3>Delete Account</h3>
+                    <button class="modal-close">&times;</button>
                 </div>
-                <div class="form-actions" style="margin-top: 1rem;">
-                    <button type="button" class="cancel-btn">Cancel</button>
-                    <button type="button" id="confirmDeleteBtn" class="delete-account-confirm-btn">Delete Permanently</button>
+                <div class="modal-body">
+                    <p style="color: #e28b8b; margin-bottom: 1rem;">
+                        <strong>⚠️ WARNING:</strong> This action is irreversible.
+                    </p>
+                    <div class="form-group">
+                        <label>Enter your password:</label>
+                        <input type="password" id="deletePasswordInput" autocomplete="off">
+                    </div>
+                    <div class="form-actions" style="margin-top: 1rem;">
+                        <button type="button" class="cancel-btn">Cancel</button>
+                        <button type="button" id="confirmDeleteBtn" class="delete-account-confirm-btn">Delete Permanently</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
         document.body.appendChild(dialog);
+        disableBodyScroll();
 
-        const closeDialog = () => dialog.remove();
+        const closeDialog = () => {
+            enableBodyScroll();
+            dialog.remove();
+        };
         dialog.querySelector('.modal-close').onclick = closeDialog;
         dialog.querySelector('.cancel-btn').onclick = closeDialog;
         dialog.onclick = (e) => { if (e.target === dialog) closeDialog(); };

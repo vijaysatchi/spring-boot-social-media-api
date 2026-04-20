@@ -601,7 +601,34 @@ img, video, iframe {
     padding: 1.5rem;
 }
 
-/* Edit Profile Modal */
+/* Edit Profile Modal – Prevent horizontal overflow */
+.edit-profile-modal {
+    overflow-x: hidden !important;
+}
+.edit-profile-modal .modal-content {
+    max-width: 550px;
+    width: 95%;
+    margin: 0 auto;
+    overflow-x: hidden !important;
+}
+.edit-profile-modal .modal-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+}
+.edit-profile-modal .avatar-picker,
+.edit-profile-modal .color-preview-wrapper,
+.edit-profile-modal .form-group {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.edit-profile-modal input,
+.edit-profile-modal textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Regular Edit Profile Modal (non‑mobile overrides) */
 .edit-profile-modal .modal-content {
     max-width: 550px;
 }
@@ -1104,4 +1131,9 @@ hr {
         height: 28px;
         font-size: 1.5rem;
     }
+}
+
+/* ===== MODAL BODY SCROLL LOCK ===== */
+body.modal-open {
+    overflow: hidden;
 }

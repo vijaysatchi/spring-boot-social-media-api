@@ -7,7 +7,6 @@ export function showToast(message, type = 'success') {
         container = document.createElement('div');
         container.className = 'toast-container';
         document.body.appendChild(container);
-        console.log('Created toast container');
     }
 
     const toast = document.createElement('div');

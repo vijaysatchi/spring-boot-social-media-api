@@ -55,7 +55,7 @@ export function renderProfileHeader(user, currentViewerId) {
                     ` : ''}
                 </div>
                 <div class="profile-meta">
-                    <i class="fas fa-calendar-alt"></i> Joined ${joinDate}
+                    <i class="fas fa-calendar-alt"></i> Joined ${joinDate} ago
                 </div>
             </div>
         </div>
