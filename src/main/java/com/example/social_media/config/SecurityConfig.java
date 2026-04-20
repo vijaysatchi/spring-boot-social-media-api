@@ -36,18 +36,23 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(c -> c
                                                         // basic visitor privileges
-                .requestMatchers(HttpMethod.GET,"/api/post/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/post/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/post/{id}/comments/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/post/feed/global").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/user/{id}/post/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/comment/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/user").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/user/{id}").permitAll()
                                                         // auth
                 .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
                                                         // pages
                 .requestMatchers(HttpMethod.GET,"/feed/global").permitAll()
+                .requestMatchers(HttpMethod.GET,"/feed/following").permitAll()
                 .requestMatchers(HttpMethod.GET,"/login").permitAll()
                 .requestMatchers(HttpMethod.GET,"/register").permitAll()
                 .requestMatchers(HttpMethod.GET,"/post/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/profile/**").permitAll()
                                                         // static assets
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                                                         // home page

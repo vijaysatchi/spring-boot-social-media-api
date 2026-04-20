@@ -1,14 +1,12 @@
 package com.example.social_media.controllers;
 
 import com.example.social_media.config.JwtConfig;
-import com.example.social_media.dtos.LoginRequestDto;
-import com.example.social_media.dtos.RegisterUserRequest;
-import com.example.social_media.dtos.UserDto;
+import com.example.social_media.dtos.users.LoginRequestDto;
+import com.example.social_media.dtos.users.RegisterUserRequest;
+import com.example.social_media.dtos.users.UserDto;
 import com.example.social_media.entities.CustomUserDetails;
-import com.example.social_media.entities.User;
 import com.example.social_media.services.AuthService;
-import jakarta.servlet.http.Cookie;
-import org.springframework.http.ResponseCookie;
+import com.example.social_media.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -24,6 +22,7 @@ public class AuthController {
 
     private final AuthService authService;
     private JwtConfig jwtConfig;
+    private JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequestDto request, HttpServletResponse response) {
@@ -41,7 +40,7 @@ public class AuthController {
         response.addHeader(
                 "Set-Cookie",
                 "refreshToken=" + refreshToken +
-                        "; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=" + jwtConfig.getRefreshTokenExpiration() +
+                        "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getRefreshTokenExpiration() +
                         "; SameSite=Strict"
         );
 
@@ -58,16 +57,25 @@ public class AuthController {
 
         response.addHeader(
                 "Set-Cookie",
-                "refreshToken=; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=0; SameSite=Strict"
+                "refreshToken=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=Strict"
         );
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken") String refreshToken){
-        var jwt = authService.refresh(refreshToken);
-        return ResponseEntity.ok(jwt);
+    public ResponseEntity<?> refresh(
+            @CookieValue(value = "refreshToken") String refreshToken,
+            HttpServletResponse response){
+
+        var accessToken = jwtService.refresh(refreshToken);
+        response.addHeader(
+                "Set-Cookie",
+                "accessToken=" + accessToken +
+                        "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getAccessTokenExpiration() +
+                        "; SameSite=Strict"
+        );
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/validate")

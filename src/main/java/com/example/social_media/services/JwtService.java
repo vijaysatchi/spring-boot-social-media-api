@@ -1,6 +1,7 @@
 package com.example.social_media.services;
 
 import com.example.social_media.config.JwtConfig;
+import com.example.social_media.exceptions.BadRequestException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,14 @@ public class JwtService {
     public Jwt generateAccessToken(long userId, Map<String, Object> customClaims){
         return generateToken(userId, customClaims, jwtConfig.getAccessTokenExpiration());
 
+    }
+
+    public String refresh(String refreshToken) {
+        var jwt = parseToken(refreshToken);
+        if(jwt == null || jwt.isExpired()){
+            throw new BadRequestException("Session expired. Log in again.");
+        }
+        return generateAccessToken(jwt.getUserId(), null).toString();
     }
 
     public Jwt generateRefreshToken(long userId, Map<String, Object> customClaims){

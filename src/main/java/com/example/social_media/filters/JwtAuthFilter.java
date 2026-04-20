@@ -1,6 +1,8 @@
 package com.example.social_media.filters;
 
+import com.example.social_media.config.JwtConfig;
 import com.example.social_media.services.CustomUserDetailsService;
+import com.example.social_media.services.Jwt;
 import com.example.social_media.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,33 +22,39 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtConfig jwtConfig;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        var header = request.getHeader("Authorization");
-//        if (header == null || !header.startsWith("Bearer ")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-
-        String token = null; //= header.substring(7);
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
+    private String getCookieValue(Cookie[] cookies, String name) {
+        if(cookies != null){
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("accessToken")) {
-                    token = cookie.getValue();
-                    break;
+                if (cookie.getName().equals(name)) {
+                    return cookie.getValue();
                 }
             }
         }
+        return null;
+    }
 
-        if(token == null){
-            filterChain.doFilter(request, response);
-            return;
-        }
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        Cookie[] cookies = request.getCookies();
+        String accessToken = getCookieValue(cookies, "accessToken");
+        Jwt jwt = null;
+        if(accessToken == null){
+            String refreshToken = getCookieValue(cookies, "refreshToken");
+            if(refreshToken != null) {
+                accessToken = jwtService.refresh(refreshToken);
+                response.addHeader(
+                        "Set-Cookie",
+                        "accessToken=" + accessToken +
+                                "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getAccessTokenExpiration() +
+                                "; SameSite=Strict"
+                );
+                jwt = jwtService.parseToken(accessToken);
+            }
+        } else jwt = jwtService.parseToken(accessToken);
 
-        var jwt = jwtService.parseToken(token);
-        if (jwt == null) {
+        if (jwt == null || jwt.isExpired()) {
             filterChain.doFilter(request, response);
             return;
         }
