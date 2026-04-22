@@ -55,8 +55,8 @@
         <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
-        <artifactId>mysql-connector-j</artifactId>
-        <groupId>com.mysql</groupId>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
         <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -64,8 +64,8 @@
         <groupId>org.flywaydb</groupId>
     </dependency>
     <dependency>
-        <artifactId>flyway-mysql</artifactId>
         <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
     <dependency>
         <artifactId>lombok</artifactId>
@@ -155,7 +155,7 @@
         <plugin>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-maven-plugin</artifactId>
-            <version>10.15.0</version>
+            <version>11.14.1</version>
             <configuration>
                 <cleanDisabled>false</cleanDisabled>
             </configuration>
