@@ -37,7 +37,7 @@ export function createCommentElement(comment, { onLikeToggle, onEdit, onDelete }
             <div class="comment-text">${escapeHtml(comment.content)}</div>
             <div class="comment-actions">
                 <button class="comment-like-btn ${comment.liked ? 'liked' : ''}" data-comment-id="${comment.id}">
-                    <i class="${comment.liked ? 'fas' : 'far'} fa-heart"></i> <span>${comment.likeCount}</span>
+                    <i class="${comment.liked ? 'fas' : 'far'} fa-heart"></i> <span class="like-count">${comment.likeCount ? comment.likeCount : ''}</span>
                 </button>
             </div>
         </div>

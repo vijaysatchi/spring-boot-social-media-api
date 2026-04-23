@@ -30,7 +30,7 @@ export function createPostElement(post, { onCommentClick, enableEdit = false, on
             <div class="post-user-info">
                 <span class="post-user-name" data-user-id="${post.userId}">${escapeHtml(post.userName)}</span>
                 <div class="post-meta">
-                    <i class="far fa-clock"></i> ${formatRelativeTime(post.timeCreated)}
+                    <i class="far fa-clock"></i> ${formatRelativeTime(post.dateCreated)}
                     ${editInfo}
                 </div>
             </div>
@@ -41,7 +41,7 @@ export function createPostElement(post, { onCommentClick, enableEdit = false, on
         </div>
         <div class="post-actions">
             <button class="action-btn like-btn ${post.liked ? 'liked' : ''}" data-post-id="${post.id}">
-                <i class="${post.liked ? 'fas' : 'far'} fa-heart"></i> <span>${post.likeCount}</span>
+                <i class="${post.liked ? 'fas' : 'far'} fa-heart"></i> <span class="like-count">${post.likeCount ? post.likeCount : ''}</span>
             </button>
             <button class="action-btn comment-btn" data-post-id="${post.id}">
                 <i class="far fa-comment"></i> Comment

@@ -20,7 +20,7 @@ export async function initProfile(userId) {
         renderCompactSidebar(user);
         initStickyHeader();
         if (isOwnProfile) {
-            const composerContainer = document.getElementById('profilePostComposer');
+            const composerContainer = document.getElementById('postComposer');
             if (composerContainer) {
                 composerContainer.style.display = 'block';
                 initPostComposer(); // similar to feed's composer but targeting profile feed

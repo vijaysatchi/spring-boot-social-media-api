@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class PostDto {
     private Long id;
     private String caption;
-    private LocalDateTime timeCreated;
+    private LocalDateTime dateCreated;
     private Long likeCount;
     private LocalDateTime updatedAt;
     private Boolean liked;
@@ -21,7 +21,7 @@ public class PostDto {
 
     public PostDto(Long id,
                    String caption,
-                   LocalDateTime timeCreated,
+                   LocalDateTime dateCreated,
                    Long likeCount,
                    LocalDateTime updatedAt,
                    Boolean liked,
@@ -30,7 +30,7 @@ public class PostDto {
                    String profilePictureUrl) {
         this.id = id;
         this.caption = caption;
-        this.timeCreated = timeCreated;
+        this.dateCreated = dateCreated;
         this.likeCount = likeCount;
         this.updatedAt = updatedAt;
         this.liked = liked;
@@ -44,7 +44,7 @@ public class PostDto {
         return "PostDto(" +
                 "id=" + id +
                 ", caption='" + caption + '\'' +
-                ", timeCreated=" + timeCreated +
+                ", dateCreated=" + dateCreated +
                 ", likeCount=" + likeCount +
                 ", updatedAt=" + updatedAt +
                 ", liked=" + liked +

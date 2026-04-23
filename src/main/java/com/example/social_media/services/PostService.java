@@ -4,9 +4,11 @@ import com.example.social_media.dtos.posts.CreatePostRequest;
 import com.example.social_media.dtos.posts.EditPostRequest;
 import com.example.social_media.dtos.posts.PostDto;
 import com.example.social_media.entities.Post;
+import com.example.social_media.entities.PostLike;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.PostMapper;
+import com.example.social_media.repositories.PostLikeRepository;
 import com.example.social_media.repositories.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private UserService userService;
+    private final PostLikeRepository postLikeRepository;
 
     public Post findById(Long id){
         return postRepository.findById(id).orElseThrow(() ->
@@ -35,7 +38,7 @@ public class PostService {
     }
 
     public List<PostDto> getGlobalFeedByPage(Long viewerId, int pageNum) {
-        PageRequest pageRequest = PageRequest.of(pageNum, 7, Sort.by(Sort.Direction.DESC, "timeCreated"));
+        PageRequest pageRequest = PageRequest.of(pageNum, 7, Sort.by(Sort.Direction.DESC, "dateCreated"));
         if(viewerId == null) return postRepository.findAll(pageRequest)
                 .getContent()
                 .stream()
@@ -47,13 +50,13 @@ public class PostService {
     }
 
     public List<PostDto> getFollowingFeedByPage(long userId, int pages) {
-        PageRequest pageRequest = PageRequest.of(pages, 7, Sort.by(Sort.Direction.DESC, "timeCreated"));
+        PageRequest pageRequest = PageRequest.of(pages, 7, Sort.by(Sort.Direction.DESC, "dateCreated"));
         return postRepository.findAllByFollowerIdWithIsLiked(userId, pageRequest)
                 .toList();
     }
 
     public List<PostDto> getUsersPosts(long userId, int pages, Long viewerId) {
-        PageRequest pageRequest = PageRequest.of(pages, 7, Sort.by(Sort.Direction.DESC, "timeCreated"));
+        PageRequest pageRequest = PageRequest.of(pages, 7, Sort.by(Sort.Direction.DESC, "dateCreated"));
         if(viewerId == null) return postRepository.findAllByUserId(userId, pageRequest)
                 .getContent()
                 .stream()
@@ -91,20 +94,14 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    public boolean isLikedByUser(Long postId, Long userId) {
-        return 1L == postRepository.isLikedByUser(postId, userId);
-    }
-
     @Transactional
-    public void togglePostLike(Long postId, Long userId) {
-//        var post = postRepository.findById(postId).orElseThrow(() ->
-//                new BadRequestException("Post #" + postId + " not found."));
+    public void toggleLike(Long postId, Long userId) {
         var post = findById(postId);
-        if(isLikedByUser(postId, userId)){
-            postRepository.removeLike(userId, postId);
+        if(postLikeRepository.existsByUserIdAndPostId(userId, postId)){
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
             post.setLikeCount(post.getLikeCount() - 1);
         }else{
-            postRepository.addLike(userId, postId);
+            postLikeRepository.save(new PostLike(postId, userId));
             post.setLikeCount(post.getLikeCount() + 1);
         }
         postRepository.save(post);

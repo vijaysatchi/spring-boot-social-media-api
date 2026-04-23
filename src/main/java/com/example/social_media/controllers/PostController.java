@@ -58,15 +58,6 @@ public class PostController {
         return ResponseEntity.ok(postsList);
     }
 
-    @GetMapping("/post/{id}/isliked/{user_id}")
-    public ResponseEntity<Boolean> isPostLikedByUser(
-            @PathVariable("id") Long post_id,
-            @PathVariable("user_id") Long user_id
-    ){
-        var isLiked = postService.isLikedByUser(user_id, post_id);
-        return ResponseEntity.ok(isLiked);
-    }
-
     @PostMapping("/post")
     public ResponseEntity<PostDto> createPost(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -82,7 +73,7 @@ public class PostController {
     public ResponseEntity<Void> toggleLike(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user){
-        postService.togglePostLike(id, user.getId());
+        postService.toggleLike(id, user.getId());
         return ResponseEntity.ok().build();
     }
 

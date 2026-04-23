@@ -50,7 +50,7 @@ export function initPostComposer() {
             const postEl = createPostElement(newPost, {
                 onCommentClick: (id) => window.location.href = `/post/${id}`
             });
-            const feed = document.getElementById('feed');
+            const feed = document.getElementById('feed') || document.getElementById("userPostsFeed");
             feed.insertBefore(postEl, feed.firstChild);
             postEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
             showToast('Post created');
