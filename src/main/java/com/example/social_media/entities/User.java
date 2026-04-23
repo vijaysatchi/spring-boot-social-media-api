@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -62,23 +60,6 @@ public class User{
 
     @OneToMany(mappedBy = "follower", orphanRemoval = true)
     private List<Follow> following;
-
-    @ManyToMany
-    @JoinTable(
-            name = "comment_likes",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id")
-    )
-    private Set<Comment> likedComments = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "post_likes",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
-    )
-    private Set<Post> likedPosts = new HashSet<>();
-
 
     public void addPost(Post post){
         posts.add(post);

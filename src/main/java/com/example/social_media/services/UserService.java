@@ -7,10 +7,7 @@ import com.example.social_media.entities.User;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.UserMapper;
-import com.example.social_media.repositories.CommentRepository;
-import com.example.social_media.repositories.FollowRepository;
-import com.example.social_media.repositories.PostRepository;
-import com.example.social_media.repositories.UserRepository;
+import com.example.social_media.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +25,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private CommentRepository commentRepository;
     private PostRepository postRepository;
+    private CommentLikeRepository commentLikeRepository;
+    private PostLikeRepository postLikeRepository;
 
     public User findById(Long id){
         return userRepository.findById(id).orElseThrow(() ->
@@ -117,10 +116,10 @@ public class UserService {
     public void delete(Long userId, DeleteAccountRequest request) {
         var user = findById(userId);
         doesPasswordMatch(request.getPassword(), user);
-        commentRepository.removeDeletedUsersLikedComments(userId);
-        postRepository.removeDeletedUsersLikedPosts(userId);
-        commentRepository.deleteCommentLikesByUserId(userId);
-        postRepository.deletePostLikesByUserId(userId);
+        commentRepository.removeDeletedUsersLikedCommentsFromCount(userId);
+        postRepository.removeDeletedUsersLikedPostsFromCount(userId);
+        commentLikeRepository.deleteByUserId(userId);
+        postLikeRepository.deleteByUserId(userId);
         commentRepository.deleteByUserId(userId);
         postRepository.deleteByUserId(userId);
         followRepository.removeDeletedUsersFollowers(userId);

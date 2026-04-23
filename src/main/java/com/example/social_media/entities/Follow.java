@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,12 +28,12 @@ public class Follow {
     @JoinColumn(name = "following_id", nullable = false)
     private User following;
 
+    @CreationTimestamp
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
     public Follow(User follower, User following){
         this.follower = follower;
         this.following = following;
-        this.dateCreated = LocalDateTime.now();
     }
 }
