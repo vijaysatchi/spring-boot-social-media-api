@@ -14,23 +14,18 @@ import org.springframework.stereotype.Repository;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostId(Long id, Pageable pageable);
 
+    @Modifying
     void deleteByUserId(Long userId);
 
     @Modifying
     @Query(value = """
-    delete from comment_likes cl
-        where cl.user_id = :userId
-    """, nativeQuery = true)
-    void deleteCommentLikesByUserId(@Param("userId") Long userId);
-
-    @Modifying
-    @Query(value = """
     update comments c
-        join comment_likes cl on c.id = cl.comment_id
-    set c.like_count = c.like_count - 1
-    where cl.user_id = :userId
+    set like_count = c.like_count - 1
+    from comment_likes cl
+    where cl.comment_id = c.id
+        and cl.user_id = :userId
     """, nativeQuery = true)
-    void removeDeletedUsersLikedComments(@Param("userId") Long userId);
+    void removeDeletedUsersLikedCommentsFromCount(@Param("userId") Long userId);
 
     @Query("""
     select new com.example.social_media.dtos.comments.CommentDto(
@@ -51,15 +46,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         where c.post.id = :postId
     """)
     Page<CommentDto> findAllByPostIdWithIsLiked(@Param("postId") Long postId, @Param("viewerId") Long viewerId, Pageable pageable);
-
-    @Query(value = "select exists(select 1 from comment_likes where user_id = :userId and comment_id = :commentId)" , nativeQuery = true)
-    Long isLikedByUser(@Param("userId") Long userId, @Param("commentId") Long commentId);
-
-    @Modifying
-    @Query(value = "insert ignore into comment_likes(user_id, comment_id) values(:userId, :commentId)", nativeQuery = true)
-    void addLike(@Param("userId") Long userId, @Param("commentId") Long commentId);
-
-    @Modifying
-    @Query(value = "delete from comment_likes where user_id = :userId and comment_id = :commentId", nativeQuery = true)
-    void removeLike(@Param("userId") Long userId, @Param("commentId") Long commentId);
 }

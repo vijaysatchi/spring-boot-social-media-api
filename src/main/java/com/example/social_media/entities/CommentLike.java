@@ -1,7 +1,11 @@
 package com.example.social_media.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @IdClass(CommentLikeId.class)
 @Table(name = "comment_likes")

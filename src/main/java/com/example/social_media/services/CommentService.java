@@ -4,9 +4,11 @@ import com.example.social_media.dtos.comments.CommentDto;
 import com.example.social_media.dtos.comments.CreateCommentRequest;
 import com.example.social_media.dtos.comments.EditCommentRequest;
 import com.example.social_media.entities.Comment;
+import com.example.social_media.entities.CommentLike;
 import com.example.social_media.exceptions.BadRequestException;
 import com.example.social_media.exceptions.ResourceNotFoundException;
 import com.example.social_media.mappers.CommentMapper;
+import com.example.social_media.repositories.CommentLikeRepository;
 import com.example.social_media.repositories.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final PostService postService;
     private final UserService userService;
+    private CommentLikeRepository commentLikeRepository;
 
     public Comment findById(Long id){
         return commentRepository.findById(id).
@@ -78,18 +81,14 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    public boolean isLikedByUser(Long userId, Long commentId) {
-        return 1L == commentRepository.isLikedByUser(userId, commentId);
-    }
-
     @Transactional
     public void toggleLike(Long user_id, Long comment_id) {
         var comment = findById(comment_id);
-        if(isLikedByUser(user_id, comment_id)) {
-            commentRepository.removeLike(user_id, comment_id);
+        if(commentLikeRepository.existsByUserIdAndCommentId(user_id, comment_id)){
+            commentLikeRepository.deleteByUserIdAndCommentId(user_id, comment_id);
             comment.setLikeCount(comment.getLikeCount() - 1);
         }else{
-            commentRepository.addLike(user_id, comment_id);
+            commentLikeRepository.save(new CommentLike(comment_id, user_id));
             comment.setLikeCount(comment.getLikeCount() + 1);
         }
         commentRepository.save(comment);
