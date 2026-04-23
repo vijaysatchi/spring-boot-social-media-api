@@ -16,3 +16,5 @@ spring:
     secret: ${JWT_SECRET}
     accessTokenExpiration: 900
     refreshTokenExpiration: 604800
+server:
+  port: ${APP_PORT:8080}
