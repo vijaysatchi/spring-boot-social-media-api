@@ -4,14 +4,14 @@
     </div>
     <nav class="sidebar-nav">
         <a href="/feed/global" class="nav-item" id="globalLink">
-            <i class="fas fa-globe"></i> Global
+            <i class="fas fa-globe fa-fw"></i> Global
         </a>
         <th:block th:if="${currentUser != null}">
             <a href="/feed/following" class="nav-item" id="followingLink">
-                <i class="fas fa-user-friends"></i> Following
+                <i class="fas fa-user-friends fa-fw"></i> Following
             </a>
             <a href="/profile" class="nav-item" id="profileLink">
-                <i class="fas fa-user"></i> Profile
+                <i class="fas fa-user fa-fw"></i> Profile
             </a>
         </th:block>
         <div id="authButtons"></div>

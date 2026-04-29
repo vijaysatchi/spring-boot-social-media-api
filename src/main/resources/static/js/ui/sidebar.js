@@ -9,15 +9,15 @@ function renderSidebar() {
     if (user) {
         authContainer.innerHTML = ''; // Remove login/register if signed in
         if (logoutContainer) {
-            logoutContainer.innerHTML = `<button id="logoutBtn" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</button>`;
+            logoutContainer.innerHTML = `<button id="logoutBtn" class="nav-item"><i class="fas fa-sign-out-alt fa-fw"></i> Logout</button>`;
             document.getElementById('logoutBtn')?.addEventListener('click', () => logout());
         }
         if (profileLink) {
             profileLink.href = `/profile/${user.id}`;
         }
     } else {
-        authContainer.innerHTML = `<a href="/login" class="nav-item"><i class="fas fa-sign-in-alt"></i> Sign In</a>
-                                    <a href="/register" class="nav-item"><i class="fas fa-user-plus"></i> Sign Up</a>`;
+        authContainer.innerHTML = `<a href="/login" class="nav-item"><i class="fas fa-sign-in-alt fa-fw"></i> Sign In</a>
+                                    <a href="/register" class="nav-item"><i class="fas fa-user-plus fa-fw"></i> Sign Up</a>`;
         if (logoutContainer) logoutContainer.innerHTML = '';
     }
 }
