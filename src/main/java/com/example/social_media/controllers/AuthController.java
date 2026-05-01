@@ -87,9 +87,26 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(
             @RequestBody @Valid RegisterUserRequest request,
+            HttpServletResponse response,
             UriComponentsBuilder uriComponentsBuilder
     ){
         var userDto = authService.registerUser(request);
+        var accessToken = authService.getAccessToken(userDto.getId(), userDto.getEmail());
+        var refreshToken = authService.getRefreshToken(userDto.getId());
+
+        response.addHeader(
+                "Set-Cookie",
+                "accessToken=" + accessToken +
+                        "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getAccessTokenExpiration() +
+                        "; SameSite=Strict"
+        );
+
+        response.addHeader(
+                "Set-Cookie",
+                "refreshToken=" + refreshToken +
+                        "; HttpOnly; Secure; Path=/; Max-Age=" + jwtConfig.getRefreshTokenExpiration() +
+                        "; SameSite=Strict"
+        );
         var uri = uriComponentsBuilder.path("/api/user/{id}").buildAndExpand(userDto.getId()).toUri();
         return ResponseEntity.created(uri).body(userDto);
     }

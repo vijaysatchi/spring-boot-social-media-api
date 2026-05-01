@@ -12,8 +12,8 @@ export function renderProfileHeader(user, currentViewerId) {
 
     const isOwnProfile = currentViewerId === user.id;
     const isLoggedIn = !!currentViewerId;
-    const joinDate = formatRelativeTime(user.dateCreated);
-    const mutualCount = user.mutualFollowersCount || 0;
+    const joinDate = formatRelativeTime(user.dateCreated, {maxUnit: 'minute'});
+    const joinLabel = joinDate === 'Just now' ? 'Joined just now' : `Joined ${joinDate} ago`;
 
     let actionButtonHtml = '';
     if (isLoggedIn && !isOwnProfile) {
@@ -49,13 +49,13 @@ export function renderProfileHeader(user, currentViewerId) {
                     </div>
                     ${!isOwnProfile && isLoggedIn ? `
                     <div class="stat-item" data-type="mutuals">
-                        <span class="stat-number">${user.mutualFollowersCount}</span>
+                        <span class="stat-number">${user.mutualFollowersCount || 0}</span>
                         <span class="stat-label">Mutual</span>
                     </div>
                     ` : ''}
                 </div>
                 <div class="profile-meta">
-                    <i class="fas fa-calendar-alt"></i> Joined ${joinDate} ago
+                    <i class="fas fa-calendar-alt"></i> ${joinLabel}
                 </div>
             </div>
         </div>

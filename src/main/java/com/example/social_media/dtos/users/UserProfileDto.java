@@ -3,14 +3,14 @@ package com.example.social_media.dtos.users;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 public class UserProfileDto {
     private Long id;
     private String name;
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
     private String profilePictureUrl;
     private String bannerColour;
     private String bio;
@@ -21,7 +21,7 @@ public class UserProfileDto {
 
     public UserProfileDto(Long id,
                           String name,
-                          LocalDate dateCreated,
+                          LocalDateTime dateCreated,
                           String profilePictureUrl,
                           String bannerColour,
                           String bio,
@@ -40,7 +40,7 @@ public class UserProfileDto {
     }
     public UserProfileDto(Long id,
                           String name,
-                          LocalDate dateCreated,
+                          LocalDateTime dateCreated,
                           String profilePictureUrl,
                           String bannerColour,
                           String bio,
