@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -45,12 +46,14 @@ public class AuthService {
     }
 
     public UserDto registerUser(RegisterUserRequest request) {
-        if(userRepository.existsByEmail(request.getEmail()))
+        var formattedEmail =  request.getEmail().trim().toLowerCase(Locale.ROOT);
+        if(userRepository.existsByEmail(formattedEmail))
             throw new BadRequestException("Email already exists.");
         if(userRepository.existsByName(request.getName()))
             throw new BadRequestException("Name already exists.");
         var user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(formattedEmail);
         var newUser = userRepository.save(user);
         return userMapper.toDto(newUser);
     }
