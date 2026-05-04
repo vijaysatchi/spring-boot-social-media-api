@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
                                                         // pages
+                .requestMatchers(HttpMethod.GET,"/").permitAll()
                 .requestMatchers(HttpMethod.GET,"/feed/global").permitAll()
                 .requestMatchers(HttpMethod.GET,"/feed/following").permitAll()
                 .requestMatchers(HttpMethod.GET,"/login").permitAll()
@@ -54,8 +55,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/profile/**").permitAll()
                                                         // static assets
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                                                        // home page
-                .requestMatchers(HttpMethod.GET,"/").permitAll()
+                                                        // api docs
+                .requestMatchers(HttpMethod.GET,"/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/v3/api-docs/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

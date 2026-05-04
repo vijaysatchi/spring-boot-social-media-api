@@ -105,7 +105,7 @@ public class UserController {
         response.addCookie(accessTokenCookie);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", null);
-        refreshTokenCookie.setPath("/api/auth/refresh");
+        refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(0);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
