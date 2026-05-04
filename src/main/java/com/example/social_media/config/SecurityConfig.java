@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/auth/logout").permitAll()
                                                         // pages
                 .requestMatchers(HttpMethod.GET,"/").permitAll()
                 .requestMatchers(HttpMethod.GET,"/feed/global").permitAll()

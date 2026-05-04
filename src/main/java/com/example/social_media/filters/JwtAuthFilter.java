@@ -14,8 +14,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -23,6 +25,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final JwtConfig jwtConfig;
+    private final AntPathMatcher matcher = new AntPathMatcher();
+    private final List<String> excludedPatterns = List.of(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh",
+            "/api/auth/logout",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/favicon.ico",
+            "/"
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return excludedPatterns.stream()
+                .anyMatch(pattern -> matcher.match(pattern, path));
+    }
 
     private String getCookieValue(Cookie[] cookies, String name) {
         if(cookies != null){
@@ -40,7 +62,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         String accessToken = getCookieValue(cookies, "accessToken");
         Jwt jwt = null;
-        if(accessToken == null){
+        if(accessToken != null)
+            jwt = jwtService.parseToken(accessToken);
+        if(jwt == null || jwt.isExpired()){
             String refreshToken = getCookieValue(cookies, "refreshToken");
             if(refreshToken != null) {
                 accessToken = jwtService.refresh(refreshToken);
@@ -52,7 +76,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
                 jwt = jwtService.parseToken(accessToken);
             }
-        } else jwt = jwtService.parseToken(accessToken);
+        }
 
         if (jwt == null || jwt.isExpired()) {
             filterChain.doFilter(request, response);
